@@ -1,0 +1,4 @@
+{
+  "pokeApiBaseUrl": "https://pokeapi.co/api/v2/pokemon/",
+  "countPerPage": 20
+}
