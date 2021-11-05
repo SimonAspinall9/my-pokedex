@@ -9,9 +9,7 @@ import {
 import LoadingScreen from "./LoadingScreen";
 import {
   Box,
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   Grid,
@@ -196,16 +194,15 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
               <Grid item xs={6}>
                 <Abilities pokemon={selectedPokemon} />
               </Grid>
-              <Grid item xs={6}></Grid>
-              <Attributes pokemon={selectedPokemon} />
-              <Stats pokemon={selectedPokemon} />
+              <Grid item xs={12}>
+                <Attributes pokemon={selectedPokemon} />
+              </Grid>
+              <Grid item xs={12}>
+                <Stats pokemon={selectedPokemon} />
+              </Grid>
             </Grid>
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose}>Agree</Button>
-        </DialogActions>
       </Dialog>
     </Box>
   );
