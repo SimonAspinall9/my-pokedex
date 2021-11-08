@@ -17,14 +17,18 @@ const Sprites = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
         </Stack>
       </Grid>
       <Grid item xs={6}>
-        <Stack alignItems="center" justifyContent="center">
+        <Stack justifyContent="center" sx={{ height: "100%" }}>
           <Typography variant="h5" textAlign="center">
             Dream World
           </Typography>
           <img
             src={pokemon?.sprites.other.dream_world.front_default}
             alt={pokemon?.id.toString()}
-            style={{ height: 200, width: "fit-content" }}
+            style={{
+              height: 150,
+              width: "fit-content",
+              margin: "auto",
+            }}
           />
         </Stack>
       </Grid>

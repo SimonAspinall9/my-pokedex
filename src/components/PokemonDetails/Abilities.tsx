@@ -20,10 +20,9 @@ const Abilities = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
               <ListItem>
                 <Typography
                   variant="h5"
-                  sx={{ width: "100%" }}
-                  textAlign="center"
+                  sx={{ width: "100%", textTransform: "capitalize" }}
                 >
-                  {a.ability.name}
+                  {a.ability.name.replaceAll("-", " ")}
                 </Typography>
               </ListItem>
             </Grid>

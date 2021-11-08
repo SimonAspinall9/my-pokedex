@@ -35,12 +35,12 @@ const Attributes = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
           </Grid>
           <Grid item xs={6}>
             <Typography variant="h5" sx={{ width: "100%" }} textAlign="center">
-              {pokemon?.height}
+              {((pokemon?.height || 0) / 10).toFixed(1)}m
             </Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography variant="h5" sx={{ width: "100%" }} textAlign="center">
-              {pokemon?.weight}
+              {((pokemon?.weight || 0) / 10).toFixed(1)}kg
             </Typography>
           </Grid>
         </Grid>

@@ -13,18 +13,13 @@ import {
   DialogTitle,
   Grid,
   Slide,
-  Stack,
 } from "@mui/material";
 import Paging from "./Paging";
+import PokemonDetails from "./PokemonDetails/PokemonDetails";
 import config from "../config.json";
 import PokeCard from "./PokeCard";
 import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
-import Sprites from "./PokemonDetails/Sprites";
-import Types from "./PokemonDetails/Types";
-import Abilities from "./PokemonDetails/Abilities";
-import Attributes from "./PokemonDetails/Attributes";
-import Stats from "./PokemonDetails/Stats";
 
 const apiClient = new PokemonClient();
 
@@ -69,7 +64,7 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
   const getPrevious = async () => {
     if (currentPageNumber > 1) {
       setIsLoading(true);
-      getPokemonList((currentPageNumber - 1) * config.countPerPage);
+      getPokemonList((currentPageNumber - 2) * config.countPerPage);
       setCurrentPageNumber(currentPageNumber - 1);
     }
   };
@@ -94,6 +89,7 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
       setTotalPageNumber(Math.ceil(pokemonList.count / config.countPerPage));
       getPokemon();
     }
+    // eslint-disable-next-line
   }, [pokemonList]);
 
   if (isLoading) {
@@ -103,7 +99,6 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
   const handleClickOpen = (p: Pokemon) => {
     setOpen(true);
     setSelectedPokemon(p);
-    console.log(p.types);
   };
 
   const handleClose = () => {
@@ -182,23 +177,7 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
           } - ${selectedPokemon?.name}`}
         </DialogTitle>
         <DialogContent>
-          <Sprites pokemon={selectedPokemon} />
-          <Stack alignItems="center" justifyContent="center">
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Types pokemon={selectedPokemon} />
-              </Grid>
-              <Grid item xs={6}>
-                <Abilities pokemon={selectedPokemon} />
-              </Grid>
-              <Grid item xs={12}>
-                <Attributes pokemon={selectedPokemon} />
-              </Grid>
-              <Grid item xs={12}>
-                <Stats pokemon={selectedPokemon} />
-              </Grid>
-            </Grid>
-          </Stack>
+          <PokemonDetails pokemon={selectedPokemon} />
         </DialogContent>
       </Dialog>
     </Box>
