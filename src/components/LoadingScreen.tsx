@@ -7,7 +7,7 @@ const LoadingScreen = () => {
       alignItems="center"
       justifyContent="center"
     >
-      <CircularProgress />
+      <CircularProgress color="warning" />
     </Box>
   );
 };

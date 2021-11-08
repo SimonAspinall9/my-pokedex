@@ -74,7 +74,7 @@ const Header = ({
             control={
               <Switch
                 aria-label="Dream World Enabled"
-                color="default"
+                color="secondary"
                 onChange={onDreamWorldChange}
               />
             }

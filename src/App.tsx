@@ -14,6 +14,15 @@ const App = () => {
       primary: {
         main: "#7D78A3",
       },
+      secondary: {
+        main: "#F1B2AC",
+      },
+      warning: {
+        main: "#A29CBB",
+      },
+      background: {
+        default: "#A29CBB",
+      },
     },
   });
 
