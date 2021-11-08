@@ -60,7 +60,7 @@ const PokemonPage = ({
       try {
         setTotalPageNumber(1);
         setCurrentPageNumber(1);
-        const myP = await apiClient.getPokemonByName(searchText);
+        const myP = await apiClient.getPokemonByName(searchText.toLowerCase());
         myPokemon.push(myP);
       } catch (e) {
         console.log(e);
