@@ -1,5 +1,5 @@
 import { ListItem, Grid, Typography, Card, CardContent } from "@mui/material";
-import { Pokemon } from "classes/PokemonData";
+import { Pokemon } from "pokenode-ts";
 
 const Types = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
   return (
@@ -28,7 +28,7 @@ const Types = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
                   sx={{ textTransform: "capitalize" }}
                   textAlign="center"
                 >
-                  {t.name}
+                  {t.type.name}
                 </Typography>
               </ListItem>
             </Grid>

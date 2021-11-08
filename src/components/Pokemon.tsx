@@ -1,11 +1,10 @@
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import {
-  getPokemonByName,
-  getPokemonData,
-  getPokemonNextPrevious,
-  PokeApiResults,
+  PokemonClient,
   Pokemon,
-} from "classes/PokemonData";
+  NamedAPIResourceList,
+  NamedAPIResource,
+} from "pokenode-ts";
 import LoadingScreen from "./LoadingScreen";
 import {
   Box,
@@ -27,6 +26,8 @@ import Abilities from "./PokemonDetails/Abilities";
 import Attributes from "./PokemonDetails/Attributes";
 import Stats from "./PokemonDetails/Stats";
 
+const apiClient = new PokemonClient();
+
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement<any, any>;
@@ -37,7 +38,7 @@ const Transition = forwardRef(function Transition(
 });
 
 const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
-  const [pokemonData, setPokemonData] = useState<PokeApiResults>();
+  const [pokemonList, setPokemonList] = useState<NamedAPIResourceList>();
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [totalPageNumber, setTotalPageNumber] = useState(1);
@@ -45,59 +46,55 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
   const [open, setOpen] = useState(false);
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon>();
 
-  const getData = async () => {
-    const data = await getPokemonData();
-    setPokemonData(data);
-    setTotalPageNumber(Math.ceil(data.count / config.countPerPage));
-  };
-
-  const getPrevious = async () => {
-    if (currentPageNumber > 1 && pokemonData && pokemonData.previous) {
-      setIsLoading(true);
-      const newData = await getPokemonNextPrevious(pokemonData.previous);
-      setPokemonData(newData);
-      setCurrentPageNumber(currentPageNumber - 1);
-    }
-  };
-
-  const getNext = async () => {
-    if (
-      currentPageNumber < totalPageNumber &&
-      pokemonData &&
-      pokemonData.next
-    ) {
-      setIsLoading(true);
-      const newData = await getPokemonNextPrevious(pokemonData.next);
-      setPokemonData(newData);
-      setCurrentPageNumber(currentPageNumber + 1);
-      console.log("going to next");
-    }
+  const getPokemonList = async (offset: number = 0) => {
+    const pokemonList = await apiClient.listPokemons(
+      offset,
+      config.countPerPage
+    );
+    setPokemonList(pokemonList);
   };
 
   const getPokemon = async () => {
-    let pokemon: Pokemon[] = [];
-    if (pokemonData) {
-      for (const item of pokemonData.results) {
-        const data = await getPokemonByName(item.name);
-        pokemon.push(data);
-      }
+    let myPokemon: Pokemon[] = [];
+    for (const r of pokemonList?.results || []) {
+      const myP = await apiClient.getPokemonByName(
+        (r as NamedAPIResource).name
+      );
+      myPokemon.push(myP);
+    }
 
-      setPokemon(pokemon);
+    setPokemon(myPokemon);
+  };
+
+  const getPrevious = async () => {
+    if (currentPageNumber > 1) {
+      setIsLoading(true);
+      getPokemonList((currentPageNumber - 1) * config.countPerPage);
+      setCurrentPageNumber(currentPageNumber - 1);
+    }
+  };
+  const getNext = async () => {
+    if (currentPageNumber < totalPageNumber) {
+      setIsLoading(true);
+      getPokemonList(currentPageNumber * config.countPerPage);
+      setCurrentPageNumber(currentPageNumber + 1);
     }
   };
 
   useMemo(() => {
-    getData();
+    getPokemonList();
   }, []);
 
   useEffect(() => {
-    getPokemon();
-    // eslint-disable-next-line
-  }, [pokemonData]);
+    setIsLoading(!pokemon);
+  }, [pokemon]);
 
   useEffect(() => {
-    setIsLoading(!pokemon || pokemon.length === 0);
-  }, [pokemon]);
+    if (pokemonList?.results) {
+      setTotalPageNumber(Math.ceil(pokemonList.count / config.countPerPage));
+      getPokemon();
+    }
+  }, [pokemonList]);
 
   if (isLoading) {
     return <LoadingScreen />;

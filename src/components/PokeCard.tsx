@@ -1,5 +1,5 @@
 import { Card, CardContent, Box, Typography } from "@mui/material";
-import { Pokemon } from "classes/PokemonData";
+import { Pokemon } from "pokenode-ts";
 
 const PokeCard = ({
   pokemon,
@@ -32,7 +32,9 @@ const PokeCard = ({
           </Typography>
           <img
             src={
-              useDreamWorld ? pokemon.dreamWorldSpriteUrl : pokemon.spriteUrl
+              useDreamWorld
+                ? pokemon.sprites.other.dream_world.front_default
+                : pokemon.sprites.front_default
             }
             alt={pokemon.name}
             style={{ maxHeight: 75 }}

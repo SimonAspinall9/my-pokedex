@@ -1,5 +1,5 @@
 import { Typography, Grid, ListItem, Card, CardContent } from "@mui/material";
-import { Pokemon } from "classes/PokemonData";
+import { Pokemon } from "pokenode-ts";
 
 const Abilities = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
   return (
@@ -23,7 +23,7 @@ const Abilities = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
                   sx={{ width: "100%" }}
                   textAlign="center"
                 >
-                  {a.name}
+                  {a.ability.name}
                 </Typography>
               </ListItem>
             </Grid>

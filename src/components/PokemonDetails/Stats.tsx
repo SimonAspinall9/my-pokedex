@@ -1,5 +1,6 @@
 import { Grid, Typography, Card, CardContent } from "@mui/material";
-import { Pokemon } from "../../classes/PokemonData";
+import { Pokemon } from "pokenode-ts";
+
 const Stats = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
   return (
     <Card variant="outlined">
