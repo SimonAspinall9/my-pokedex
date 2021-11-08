@@ -20,7 +20,6 @@ import config from "../config.json";
 import PokeCard from "./PokeCard";
 import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
-import Options from "./Options";
 
 const apiClient = new PokemonClient();
 
@@ -47,7 +46,7 @@ const PokemonPage = ({
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon>();
-  const [countPerPage, setCountPerPage] = useState(config.countPerPage);
+  const [countPerPage] = useState(config.countPerPage);
 
   const getPokemonList = async (offset: number = 0) => {
     const pokemonList = await apiClient.listPokemons(offset, countPerPage);
