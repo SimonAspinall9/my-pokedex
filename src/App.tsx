@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const App = () => {
   const [useDreamWorld, setUseDreamWorld] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   return (
     <Router>
@@ -12,11 +13,19 @@ const App = () => {
         onDreamWorldChange={() => {
           setUseDreamWorld(!useDreamWorld);
         }}
+        onSearch={(e) => {
+          setSearchText(e.target.value);
+        }}
       />
       <Switch>
         <Route
           path="/"
-          component={() => <PokemonPage useDreamWorld={useDreamWorld} />}
+          component={() => (
+            <PokemonPage
+              searchText={searchText}
+              useDreamWorld={useDreamWorld}
+            />
+          )}
         />
       </Switch>
     </Router>

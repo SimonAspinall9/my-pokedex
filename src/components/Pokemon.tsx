@@ -20,6 +20,7 @@ import config from "../config.json";
 import PokeCard from "./PokeCard";
 import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
+import Options from "./Options";
 
 const apiClient = new PokemonClient();
 
@@ -32,7 +33,13 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="left" ref={ref} {...props} />;
 });
 
-const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
+const PokemonPage = ({
+  useDreamWorld,
+  searchText,
+}: {
+  useDreamWorld: boolean;
+  searchText: string;
+}) => {
   const [pokemonList, setPokemonList] = useState<NamedAPIResourceList>();
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -40,22 +47,32 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon>();
+  const [countPerPage, setCountPerPage] = useState(config.countPerPage);
 
   const getPokemonList = async (offset: number = 0) => {
-    const pokemonList = await apiClient.listPokemons(
-      offset,
-      config.countPerPage
-    );
+    const pokemonList = await apiClient.listPokemons(offset, countPerPage);
     setPokemonList(pokemonList);
   };
 
   const getPokemon = async () => {
     let myPokemon: Pokemon[] = [];
-    for (const r of pokemonList?.results || []) {
-      const myP = await apiClient.getPokemonByName(
-        (r as NamedAPIResource).name
-      );
-      myPokemon.push(myP);
+
+    if (searchText) {
+      try {
+        setTotalPageNumber(1);
+        setCurrentPageNumber(1);
+        const myP = await apiClient.getPokemonByName(searchText);
+        myPokemon.push(myP);
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      for (const r of pokemonList?.results || []) {
+        const myP = await apiClient.getPokemonByName(
+          (r as NamedAPIResource).name
+        );
+        myPokemon.push(myP);
+      }
     }
 
     setPokemon(myPokemon);
@@ -64,37 +81,17 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
   const getPrevious = async () => {
     if (currentPageNumber > 1) {
       setIsLoading(true);
-      getPokemonList((currentPageNumber - 2) * config.countPerPage);
+      getPokemonList((currentPageNumber - 2) * countPerPage);
       setCurrentPageNumber(currentPageNumber - 1);
     }
   };
   const getNext = async () => {
     if (currentPageNumber < totalPageNumber) {
       setIsLoading(true);
-      getPokemonList(currentPageNumber * config.countPerPage);
+      getPokemonList(currentPageNumber * countPerPage);
       setCurrentPageNumber(currentPageNumber + 1);
     }
   };
-
-  useMemo(() => {
-    getPokemonList();
-  }, []);
-
-  useEffect(() => {
-    setIsLoading(!pokemon);
-  }, [pokemon]);
-
-  useEffect(() => {
-    if (pokemonList?.results) {
-      setTotalPageNumber(Math.ceil(pokemonList.count / config.countPerPage));
-      getPokemon();
-    }
-    // eslint-disable-next-line
-  }, [pokemonList]);
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
 
   const handleClickOpen = (p: Pokemon) => {
     setOpen(true);
@@ -104,6 +101,27 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  useMemo(() => {
+    getPokemonList();
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(!pokemon);
+  }, [pokemon]);
+
+  useEffect(() => {
+    if (pokemonList?.results) {
+      setTotalPageNumber(Math.ceil(pokemonList.count / countPerPage));
+      getPokemon();
+    }
+    // eslint-disable-next-line
+  }, [pokemonList]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Box
@@ -152,7 +170,7 @@ const PokemonPage = ({ useDreamWorld }: { useDreamWorld: boolean }) => {
           >
             <Paging
               totalPageNumber={totalPageNumber}
-              countPerPage={config.countPerPage}
+              countPerPage={countPerPage}
               currentPageNumber={currentPageNumber}
               onPrevious={getPrevious}
               onNext={getNext}
