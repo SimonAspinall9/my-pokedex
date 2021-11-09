@@ -1,10 +1,5 @@
 import { forwardRef, useContext, useEffect, useMemo, useState } from "react";
-import {
-  PokemonClient,
-  Pokemon,
-  NamedAPIResourceList,
-  NamedAPIResource,
-} from "pokenode-ts";
+import { PokemonClient, Pokemon, NamedAPIResource } from "pokenode-ts";
 import LoadingScreen from "./LoadingScreen";
 import {
   Box,
@@ -21,7 +16,6 @@ import PokeCard from "./PokeCard";
 import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
 import { Context } from "../GlobalState/Store";
-import { FilterNoneRounded } from "@mui/icons-material";
 
 const apiClient = new PokemonClient();
 
@@ -135,10 +129,8 @@ const PokemonPage = () => {
   }, [state.pokemon]);
 
   useEffect(() => {
-    if (state.pokemonList?.results) {
-      setTotalPageNumber(Math.ceil(state.pokemonList.count / countPerPage));
-      getPokemon();
-    }
+    setTotalPageNumber(Math.ceil(state.pokemonList?.count / countPerPage));
+    getPokemon();
     // eslint-disable-next-line
   }, [state.pokemonList]);
 
