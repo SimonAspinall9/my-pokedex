@@ -2,11 +2,14 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Container from "@mui/material/Container";
+import Store from "./GlobalState/Store";
 import "./index.css";
 
 ReactDOM.render(
   <Container style={{ padding: 0, maxWidth: "100%" }}>
-    <App />
+    <Store>
+      <App />
+    </Store>
   </Container>,
   document.getElementById("root")
 );

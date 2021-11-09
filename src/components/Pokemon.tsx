@@ -1,4 +1,4 @@
-import { forwardRef, useContext, useEffect, useMemo, useState } from "react";
+import { forwardRef, useContext, useEffect, useState } from "react";
 import { PokemonClient, Pokemon, NamedAPIResource } from "pokenode-ts";
 import LoadingScreen from "./LoadingScreen";
 import {
@@ -38,14 +38,10 @@ const PokemonPage = () => {
 
   const [state, dispatch] = useContext(Context);
 
-  const getPokemonList = async () => {
-    const pokemonList = await apiClient.listPokemons(0, 3000);
-    dispatch({ type: "SET_POKEMON_LIST", payload: pokemonList });
-  };
-
   const getPokemon = async (offset: number = 0) => {
+    console.log(state.pokemonList);
     if (state.pokemonList && state.pokemonList.results) {
-      const filteredPokemonList = state.pokemonList?.results.slice(
+      const filteredPokemonList = state.pokemonList.results.slice(
         offset,
         offset + countPerPage
       );
@@ -111,27 +107,22 @@ const PokemonPage = () => {
     getPokemon((currentPageNumber - 1) * countPerPage);
   };
 
-  useMemo(() => {
-    getPokemonList();
-    // eslint-disable-next-line
-  }, []);
+  // useEffect(() => {
+  //   const typingDelay = setTimeout(() => {
+  //     searchPokemon(state.searchText);
+  //   }, 750);
 
-  useEffect(() => {
-    const typingDelay = setTimeout(() => {
-      searchPokemon(state.searchText);
-    }, 750);
-
-    return () => clearTimeout(typingDelay);
-    // eslint-disable-next-line
-  }, [state.searchText]);
+  //   return () => clearTimeout(typingDelay);
+  //   // eslint-disable-next-line
+  // }, [state.searchText]);
 
   useEffect(() => {
     setIsLoading(!state.pokemon);
   }, [state.pokemon]);
 
   useEffect(() => {
-    setTotalPageNumber(Math.ceil(state.pokemonList?.count / countPerPage));
     getPokemon();
+    setTotalPageNumber(Math.ceil(state.pokemonList?.count / countPerPage));
     // eslint-disable-next-line
   }, [state.pokemonList]);
 
