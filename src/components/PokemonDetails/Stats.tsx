@@ -77,6 +77,8 @@ const Stats = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
                   hAxis: {
                     minValue: 0,
                     maxValue: 255,
+                    viewWindow: { max: 260, min: 0 },
+                    ticks: [0, 50, 100, 150, 200, 250],
                   },
                 }}
               />

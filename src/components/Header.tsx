@@ -80,7 +80,12 @@ const Header = () => {
                 }}
               />
             }
-            label="Enable Dream World Sprites"
+            label={
+              <Typography textAlign="center">
+                Enable Dream World Sprites
+              </Typography>
+            }
+            labelPlacement={window.outerWidth < 768 ? "bottom" : "end"}
           />
           <Search>
             <SearchIconWrapper>

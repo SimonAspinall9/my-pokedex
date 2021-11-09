@@ -16,7 +16,7 @@ const Types = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
             </Typography>
           </Grid>
           {pokemon?.types.map((t, i) => (
-            <Grid item xs={6}>
+            <Grid item md={6} key={i}>
               <ListItem
                 disablePadding
                 key={i}

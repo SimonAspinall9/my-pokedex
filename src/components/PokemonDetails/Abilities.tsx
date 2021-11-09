@@ -16,7 +16,7 @@ const Abilities = ({ pokemon }: { pokemon: Pokemon | undefined }) => {
             </Typography>
           </Grid>
           {pokemon?.abilities.map((a, i) => (
-            <Grid item xs={6} key={i}>
+            <Grid item md={6} key={i}>
               <ListItem>
                 <Typography
                   variant="h5"
