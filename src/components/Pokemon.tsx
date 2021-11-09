@@ -107,14 +107,14 @@ const PokemonPage = () => {
     getPokemon((currentPageNumber - 1) * countPerPage);
   };
 
-  // useEffect(() => {
-  //   const typingDelay = setTimeout(() => {
-  //     searchPokemon(state.searchText);
-  //   }, 750);
+  useEffect(() => {
+    const typingDelay = setTimeout(() => {
+      searchPokemon(state.searchText);
+    }, 750);
 
-  //   return () => clearTimeout(typingDelay);
-  //   // eslint-disable-next-line
-  // }, [state.searchText]);
+    return () => clearTimeout(typingDelay);
+    // eslint-disable-next-line
+  }, [state.searchText]);
 
   useEffect(() => {
     setIsLoading(!state.pokemon);
