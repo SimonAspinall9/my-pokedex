@@ -1,5 +1,5 @@
 import { styled, alpha } from "@mui/material/styles";
-import { ChangeEvent } from "react";
+import { useContext } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   FormControlLabel,
@@ -11,6 +11,7 @@ import {
   Box,
   InputBase,
 } from "@mui/material";
+import { Context } from "../GlobalState/Store";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -54,13 +55,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const Header = ({
-  onDreamWorldChange,
-  onSearch,
-}: {
-  onDreamWorldChange: () => void;
-  onSearch: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-}) => {
+const Header = () => {
+  const [state, dispatch] = useContext(Context);
+
   return (
     <Box sx={{ display: "flex", flexGrow: 1 }} marginBottom={2}>
       <AppBar position="static">
@@ -75,7 +72,12 @@ const Header = ({
               <Switch
                 aria-label="Dream World Enabled"
                 color="secondary"
-                onChange={onDreamWorldChange}
+                onChange={() => {
+                  dispatch({
+                    type: "SET_DREAM_WORLD",
+                    payload: !state.useDreamWorldSprites,
+                  });
+                }}
               />
             }
             label="Enable Dream World Sprites"
@@ -87,7 +89,9 @@ const Header = ({
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
-              onChange={onSearch}
+              onChange={(e) => {
+                dispatch({ type: "SET_SEARCH_TEXT", payload: e.target.value });
+              }}
             />
           </Search>
         </Toolbar>

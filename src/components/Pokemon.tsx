@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef, useContext, useEffect, useMemo, useState } from "react";
 import {
   PokemonClient,
   Pokemon,
@@ -20,6 +20,8 @@ import config from "../config.json";
 import PokeCard from "./PokeCard";
 import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
+import { Context } from "../GlobalState/Store";
+import { FilterNoneRounded } from "@mui/icons-material";
 
 const apiClient = new PokemonClient();
 
@@ -32,15 +34,7 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="left" ref={ref} {...props} />;
 });
 
-const PokemonPage = ({
-  useDreamWorld,
-  searchText,
-}: {
-  useDreamWorld: boolean;
-  searchText: string;
-}) => {
-  const [pokemonList, setPokemonList] = useState<NamedAPIResourceList>();
-  const [pokemon, setPokemon] = useState<Pokemon[]>([]);
+const PokemonPage = () => {
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [totalPageNumber, setTotalPageNumber] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,47 +42,26 @@ const PokemonPage = ({
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon>();
   const [countPerPage] = useState(config.countPerPage);
 
-  const getPokemonList = async (offset: number = 0) => {
-    const pokemonList = await apiClient.listPokemons(offset, countPerPage);
-    setPokemonList(pokemonList);
+  const [state, dispatch] = useContext(Context);
+
+  const getPokemonList = async () => {
+    const pokemonList = await apiClient.listPokemons(0, 3000);
+    dispatch({ type: "SET_POKEMON_LIST", payload: pokemonList });
   };
 
-  const getPokemon = async () => {
-    let myPokemon: Pokemon[] = [];
+  const getPokemon = async (offset: number = 0) => {
+    if (state.pokemonList && state.pokemonList.results) {
+      const filteredPokemonList = state.pokemonList?.results.slice(
+        offset,
+        offset + countPerPage
+      );
 
-    if (searchText) {
-      try {
-        setTotalPageNumber(1);
-        setCurrentPageNumber(1);
-        const myP = await apiClient.getPokemonByName(searchText.toLowerCase());
-        myPokemon.push(myP);
-      } catch (e) {
-        console.log(e);
+      let pokemon: Pokemon[] = [];
+      for (const poke of filteredPokemonList) {
+        pokemon.push(await apiClient.getPokemonByName(poke.name));
       }
-    } else {
-      for (const r of pokemonList?.results || []) {
-        const myP = await apiClient.getPokemonByName(
-          (r as NamedAPIResource).name
-        );
-        myPokemon.push(myP);
-      }
-    }
 
-    setPokemon(myPokemon);
-  };
-
-  const getPrevious = async () => {
-    if (currentPageNumber > 1) {
-      setIsLoading(true);
-      getPokemonList((currentPageNumber - 2) * countPerPage);
-      setCurrentPageNumber(currentPageNumber - 1);
-    }
-  };
-  const getNext = async () => {
-    if (currentPageNumber < totalPageNumber) {
-      setIsLoading(true);
-      getPokemonList(currentPageNumber * countPerPage);
-      setCurrentPageNumber(currentPageNumber + 1);
+      dispatch({ type: "SET_POKEMON", payload: pokemon });
     }
   };
 
@@ -101,22 +74,73 @@ const PokemonPage = ({
     setOpen(false);
   };
 
+  const getNext = async () => {
+    if (currentPageNumber < totalPageNumber) {
+      setIsLoading(true);
+      await getPokemon(currentPageNumber * countPerPage);
+      setCurrentPageNumber(currentPageNumber + 1);
+    }
+  };
+
+  const getPrevious = async () => {
+    if (currentPageNumber > 1) {
+      setIsLoading(true);
+      await getPokemon((currentPageNumber - 2) * countPerPage);
+      setCurrentPageNumber(currentPageNumber - 1);
+    }
+  };
+
+  const searchPokemon = async (searchText: string) => {
+    setIsLoading(true);
+    if (searchText && searchText.trim() && searchText.length >= 3) {
+      const filteredResources = state.pokemonList.results.filter(
+        (r: NamedAPIResource) =>
+          r.name.toLowerCase().startsWith(searchText) ||
+          r.name.toLowerCase().includes(searchText)
+            ? r.name
+            : null
+      );
+      setTotalPageNumber(1);
+      setCurrentPageNumber(1);
+      const filteredPokemon: Pokemon[] = [];
+      for (const r of filteredResources) {
+        const pokemon = await apiClient.getPokemonByName(r.name);
+        filteredPokemon.push(pokemon);
+      }
+
+      dispatch({ type: "SET_POKEMON", payload: filteredPokemon });
+      return;
+    }
+
+    setTotalPageNumber(Math.ceil(state.pokemonList.count / countPerPage));
+    setCurrentPageNumber(1);
+    getPokemon((currentPageNumber - 1) * countPerPage);
+  };
+
   useMemo(() => {
     getPokemonList();
     // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
-    setIsLoading(!pokemon);
-  }, [pokemon]);
+    const typingDelay = setTimeout(() => {
+      searchPokemon(state.searchText);
+    }, 750);
+
+    return () => clearTimeout(typingDelay);
+  }, [state.searchText]);
 
   useEffect(() => {
-    if (pokemonList?.results) {
-      setTotalPageNumber(Math.ceil(pokemonList.count / countPerPage));
+    setIsLoading(!state.pokemon);
+  }, [state.pokemon]);
+
+  useEffect(() => {
+    if (state.pokemonList?.results) {
+      setTotalPageNumber(Math.ceil(state.pokemonList.count / countPerPage));
       getPokemon();
     }
     // eslint-disable-next-line
-  }, [pokemonList]);
+  }, [state.pokemonList]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -134,7 +158,7 @@ const PokemonPage = ({
       justifyContent="center"
     >
       <Grid container spacing={2}>
-        {pokemon.map((p) => (
+        {state.pokemon.map((p: Pokemon) => (
           <Grid item md={3} xs={6} key={p.id}>
             <Box
               sx={{
@@ -145,11 +169,7 @@ const PokemonPage = ({
               alignItems="center"
               justifyContent="space-between"
             >
-              <PokeCard
-                pokemon={p}
-                useDreamWorld={useDreamWorld}
-                onClick={() => handleClickOpen(p)}
-              />
+              <PokeCard pokemon={p} onClick={() => handleClickOpen(p)} />
             </Box>
           </Grid>
         ))}
