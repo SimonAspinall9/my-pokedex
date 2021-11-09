@@ -122,6 +122,7 @@ const PokemonPage = () => {
     }, 750);
 
     return () => clearTimeout(typingDelay);
+    // eslint-disable-next-line
   }, [state.searchText]);
 
   useEffect(() => {
