@@ -39,7 +39,6 @@ const PokemonPage = () => {
   const [state, dispatch] = useContext(Context);
 
   const getPokemon = async (offset: number = 0) => {
-    console.log(state.pokemonList);
     if (state.pokemonList && state.pokemonList.results) {
       const filteredPokemonList = state.pokemonList.results.slice(
         offset,
